@@ -1,0 +1,49 @@
+{
+    "Modules": [
+        {
+            "Dir": "../../modules/google_project_service",
+            "Key": "google_project_service",
+            "Source": "../../modules/google_project_service"
+        },
+        {
+            "Dir": "../../modules/google_compute_network",
+            "Key": "network",
+            "Source": "../../modules/google_compute_network"
+        },
+        {
+            "Dir": "../../modules/google_cloud_asset_folder_feed",
+            "Key": "google_cloud_asset_organization",
+            "Source": "../../modules/google_cloud_asset_folder_feed"
+        },
+        {
+            "Dir": "../../modules/google_project",
+            "Key": "project",
+            "Source": "../../modules/google_project"
+        },
+        {
+            "Dir": ".",
+            "Key": "",
+            "Source": ""
+        },
+        {
+            "Dir": "../../modules/google_cloud_asset_folder_feed",
+            "Key": "google_cloud_asset_folder_feed",
+            "Source": "../../modules/google_cloud_asset_folder_feed"
+        },
+        {
+            "Dir": "../../modules/google_compute_firewall",
+            "Key": "firewall",
+            "Source": "../../modules/google_compute_firewall"
+        },
+        {
+            "Dir": "../../modules/google_folder",
+            "Key": "folders",
+            "Source": "../../modules/google_folder"
+        },
+        {
+            "Dir": "../../modules/google_compute_subnetwork",
+            "Key": "sub_network",
+            "Source": "../../modules/google_compute_subnetwork"
+        }
+    ]
+}
