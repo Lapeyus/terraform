@@ -22,7 +22,9 @@ jobs:
         run: |
           CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
-          echo "changed_modules=$CHANGED_MODULES" >> $GITHUB_ENV
+          echo "changed_modules<<EOF" >> $GITHUB_ENV
+          echo "$CHANGED_MODULES" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Fail if no changes detected
         if: env.changed_modules == ''
@@ -42,7 +44,7 @@ jobs:
       - name: Get Semver from Commit Messages or Increment Version
         id: get_semver
         run: |
-          for module in ${{ env.changed_modules }}; do
+          while read module; do
             echo "Processing module: $module"
             SEMVER=$(git log -1 --pretty=%B | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
             echo "Found SEMVER in commit message: $SEMVER"
@@ -65,16 +67,16 @@ jobs:
             fi
             NEW_TAG="$module-v$SEMVER"
             echo "New tag for $module is $NEW_TAG"
-            echo "new_tag_$module=$NEW_TAG" >> $GITHUB_ENV
-          done
+            echo "$module=$NEW_TAG" >> $GITHUB_ENV
+          done <<< "${{ env.changed_modules }}"
 
       - name: Create GitHub Release
         if: env.changed_modules != ''
         run: |
-          for module in ${{ env.changed_modules }}; do
-            NEW_TAG=$(printenv new_tag_$module)
+          while read module; do
+            NEW_TAG=$(printenv $module)
             echo "Creating release for $module with tag $NEW_TAG"
-            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module Release $NEW_TAG" -n "Release for module $module"
-          done
+            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release $NEW_TAG" -n "Release for module $module"
+          done <<< "${{ env.changed_modules }}"
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
