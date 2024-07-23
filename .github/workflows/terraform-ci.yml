@@ -65,18 +65,94 @@ jobs:
           tflint --chdir="modules/$module" -f compact
         done < changed_modules.txt
 
+yaml
+Copiar código
+name: Terraform CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'modules/**'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Detect Changed Modules
+      id: changes
+      run: |
+        git fetch origin main:refs/remotes/origin/main
+        CHANGED_MODULES=$(git diff --name-only origin/main...HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
+        echo "Changed modules: $CHANGED_MODULES"
+        echo "$CHANGED_MODULES" > changed_modules.txt
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+
+    - name: Terraform Init
+      run: |
+        while read -r module; do
+          terraform -chdir="modules/$module" init
+        done < changed_modules.txt
+
+    - name: Terraform Validate
+      run: |
+        while read -r module; do
+          terraform -chdir="modules/$module" validate
+        done < changed_modules.txt
+
+    - name: Terraform Format Check
+      run: |
+        while read -r module; do
+          terraform -chdir="modules/$module" fmt -check
+        done < changed_modules.txt
+
+    - uses: terraform-linters/setup-tflint@v4
+      name: Setup TFLint
+      with:
+        tflint_version: v0.50.3
+
+    - name: Show version
+      run: tflint --version
+
+    - name: Init TFLint
+      run: tflint --init
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run TFLint
+      run: |
+        while read -r module; do
+          tflint --chdir="modules/$module" -f compact
+        done < changed_modules.txt
+
     - name: Run Checkov action
       run: |
         while read -r module; do
           echo "Running Checkov on modules/$module"
-          uses: bridgecrewio/checkov-action@master
-          with:
-            directory: "modules/$module"
-            framework: terraform
-            output_format: sarif
-            output_file_path: "modules/$module/reports/results.sarif"
-            download_external_modules: true
+          checkov --directory "modules/$module" --framework terraform --output-format sarif --output-file-path "modules/$module/reports/results.sarif" --download-external-modules true
         done < changed_modules.txt
+
+    # - name: Run Checkov action
+    #   run: |
+    #     while read -r module; do
+    #       echo "Running Checkov on modules/$module"
+    #       uses: bridgecrewio/checkov-action@master
+    #       with:
+    #         directory: "modules/$module"
+    #         framework: terraform
+    #         output_format: sarif
+    #         output_file_path: "modules/$module/reports/results.sarif"
+    #         download_external_modules: true
+    #     done < changed_modules.txt
 
     # - name: Set up Test Matrix
     #   id: matrix-setup
