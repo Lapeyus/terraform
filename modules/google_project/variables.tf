@@ -24,6 +24,3 @@ variable "environments" {
   }))
   default = []
 }
-
-
-
