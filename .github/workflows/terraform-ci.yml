@@ -58,9 +58,7 @@ jobs:
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
         with:
-          # Specify directory based on the content of the 'changed_modules.txt' file. 
-          directory: | 
-            ./modules/$(cat changed_modules.txt)  
+          directory: modules/${{ join(fromJSON(steps.changes.outputs.changed_modules), ',modules/') }} 
           framework: terraform
-          download_external_modules: true 
+          download_external_modules: true
 
