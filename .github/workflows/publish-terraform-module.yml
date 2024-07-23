@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2  # Fetching the full history
+          fetch-depth: 0  # Fetch all history for tags
 
       - name: Detect Changed Modules
         id: changes
