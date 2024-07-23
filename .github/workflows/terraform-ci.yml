@@ -72,7 +72,8 @@ jobs:
       - name: Run Checkov action
         id: checkov
         uses: bridgecrewio/checkov-action@master
-        directory: ./modules/  # Scan all modules in the modules directory
+        with:
+          directory: ./modules/  # Scan all modules in the modules directory
           #file: example/tfplan.json  # Remove this line if you are not providing a plan file
           #check:  # Remove this line if you are not specifying a specific check
           #skip_check:  # Remove this line if you are not skipping a specific check
