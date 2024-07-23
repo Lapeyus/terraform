@@ -22,6 +22,9 @@ jobs:
         with:
           node-version: '14'
 
+      - name: Install jq
+        run: sudo apt-get install jq
+
       - name: Detect Changed Modules
         id: changes
         run: |
@@ -44,23 +47,35 @@ jobs:
             cd ../..
           done
 
-      - name: Create GitHub Release
-        if: env.changed_modules != ''
-        id: create_release
-        uses: actions/create-release@v1
+      - name: Get Semver from Commit or PR Comments
+        id: get_semver
+        run: |
+          for module in ${{ env.changed_modules }}; do
+            PR_URL=$(jq -r '.pull_requests[0].url' < "$GITHUB_EVENT_PATH")
+            SEMVER=$(curl -s -H "Authorization: token ${{ secrets.PAT }}" $PR_URL/comments | jq -r '.[] | select(.body | test("[0-9]+\\.[0-9]+\\.[0-9]+")).body' | grep -o -E '[0-9]+\\.[0-9]+\\.[0-9]+' | head -n 1)
+            if [ -z "$SEMVER" ]; then
+              echo "No semver found in PR comments. Using latest tag logic."
+              LATEST_TAG=$(git tag -l "$module-v*" | sort -V | tail -n 1)
+              if [ -z "$LATEST_TAG" ]; then
+                SEMVER="v1.0.0"
+              else
+                VERSION=$(echo $LATEST_TAG | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+')
+                SEMVER="v$(echo $VERSION | awk -F. '{print $1"."$2"."$3+1}')"
+              fi
+            fi
+            NEW_TAG="$module-$SEMVER"
+            echo "New tag for $module is $NEW_TAG"
+            echo "new_tag_$module=$NEW_TAG" >> $GITHUB_ENV
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          tag_name: "v1.0.0-${{ env.changed_modules }}"
-          release_name: "Module ${{ env.changed_modules }} Release"
-          draft: false
-          prerelease: false
 
-      - name: Upload Release Assets
+      - name: Create GitHub Release
         if: env.changed_modules != ''
         run: |
           for module in ${{ env.changed_modules }}; do
-            gh release upload "v1.0.0-$module" "${module}.tar.gz"
+            NEW_TAG=$(printenv new_tag_$module)
+            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release" -n "Release for module $module"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
