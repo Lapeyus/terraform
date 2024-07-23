@@ -59,6 +59,7 @@ jobs:
                 PATCH=$(echo $VERSION | cut -d. -f3)
                 PATCH=$((PATCH + 1))
                 SEMVER="$MAJOR.$MINOR.$PATCH"
+                echo "Incremented version: $SEMVER"
               fi
             fi
             NEW_TAG="$module-v$SEMVER"
