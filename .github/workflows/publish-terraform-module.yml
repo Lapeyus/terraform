@@ -22,9 +22,8 @@ jobs:
         run: |
           CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
-          echo "changed_modules<<EOF" >> $GITHUB_ENV
-          echo "$CHANGED_MODULES" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
+          echo "$CHANGED_MODULES" > changed_modules.txt
+          echo "changed_modules=$(cat changed_modules.txt)" >> $GITHUB_ENV
 
       - name: Fail if no changes detected
         if: env.changed_modules == ''
@@ -35,7 +34,7 @@ jobs:
       - name: Compress Changed Modules
         if: env.changed_modules != ''
         run: |
-          for module in ${{ env.changed_modules }}; do
+          for module in $(cat changed_modules.txt); do
             cd modules/$module
             tar -czvf ../../${module}.tar.gz *
             cd ../..
@@ -44,7 +43,7 @@ jobs:
       - name: Get Semver from Commit Messages or Increment Version
         id: get_semver
         run: |
-          while read module; do
+          for module in $(cat changed_modules.txt); do
             echo "Processing module: $module"
             SEMVER=$(git log -1 --pretty=%B | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
             echo "Found SEMVER in commit message: $SEMVER"
@@ -67,16 +66,22 @@ jobs:
             fi
             NEW_TAG="$module-v$SEMVER"
             echo "New tag for $module is $NEW_TAG"
-            echo "$module=$NEW_TAG" >> $GITHUB_ENV
-          done <<< "${{ env.changed_modules }}"
+            echo "$module=$NEW_TAG" >> new_tags.txt
+          done
+
+      - name: Set New Tags Environment Variable
+        run: |
+          while read line; do
+            echo "$line" >> $GITHUB_ENV
+          done < new_tags.txt
 
       - name: Create GitHub Release
         if: env.changed_modules != ''
         run: |
-          while read module; do
+          for module in $(cat changed_modules.txt); do
             NEW_TAG=$(printenv $module)
             echo "Creating release for $module with tag $NEW_TAG"
             gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release $NEW_TAG" -n "Release for module $module"
-          done <<< "${{ env.changed_modules }}"
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
