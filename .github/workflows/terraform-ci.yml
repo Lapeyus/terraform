@@ -14,16 +14,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for detecting changes
 
       - name: Detect Changed Modules
         id: changes
         run: |
-          git fetch origin main:refs/remotes/origin/main || true
-          CHANGED_MODULES=$(git diff --name-only origin/main...HEAD || git diff --name-only HEAD)
-          CHANGED_MODULES=$(echo "$CHANGED_MODULES" | grep '^modules/' | cut -d'/' -f1,2 | sort -u)
+          CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
           echo "$CHANGED_MODULES" > changed_modules.txt
-          echo "::set-output name=changed_modules::$CHANGED_MODULES"
+
+      - name: Exit if no changes detected
+        run: |
+          if [ ! -s changed_modules.txt ]; then
+            echo "No changes detected in the modules folder. Exiting."
+            exit 0
+          fi
 
       - name: Debug Changed Modules
         run: |
@@ -45,12 +51,10 @@ jobs:
       - name: Terraform Init, Validate, and Format Check
         run: |
           while read -r module; do
-            echo "Processing module: $module"
-            if [ -n "$module" ]; then
-              terraform -chdir="$module" init -upgrade
-              terraform -chdir="$module" validate
-              terraform -chdir="$module" fmt -check
-            fi
+            echo "Processing module: modules/$module"
+            terraform -chdir="modules/$module" init -upgrade
+            terraform -chdir="modules/$module" validate
+            terraform -chdir="modules/$module" fmt -check
           done < changed_modules.txt
 
       - name: Setup TFLint
@@ -61,10 +65,8 @@ jobs:
       - name: Run TFLint
         run: |
           while read -r module; do
-            echo "Running TFLint on module: $module"
-            if [ -n "$module" ]; then
-              tflint --chdir="$module" -f compact
-            fi
+            echo "Running TFLint on module: modules/$module"
+            tflint --chdir="modules/$module" -f compact
           done < changed_modules.txt
 
       - name: Install Checkov
@@ -73,8 +75,6 @@ jobs:
       - name: Run Checkov
         run: |
           while read -r module; do
-            echo "Running Checkov on $module"
-            if [ -n "$module" ]; then
-              checkov --directory "$module" --framework terraform --download-external-modules true
-            fi
+            echo "Running Checkov on modules/$module"
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true
           done < changed_modules.txt
