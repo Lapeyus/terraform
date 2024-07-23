@@ -53,8 +53,8 @@ jobs:
           while read -r module; do
             echo "Processing module: modules/$module"
             terraform -chdir="modules/$module" init -upgrade
-            terraform -chdir="modules/$module" validate
-            terraform -chdir="modules/$module" fmt -check
+            terraform -chdir="modules/$module" validate || { echo "Terraform validate failed for $module"; exit 1; }
+            terraform -chdir="modules/$module" fmt -check || { echo "Terraform fmt check failed for $module"; exit 1; }
           done < changed_modules.txt
 
       - name: Setup TFLint
@@ -66,7 +66,7 @@ jobs:
         run: |
           while read -r module; do
             echo "Running TFLint on module: modules/$module"
-            tflint --chdir="modules/$module" -f compact
+            tflint --chdir="modules/$module" -f compact || { echo "TFLint failed for $module"; exit 1; }
           done < changed_modules.txt
 
       - name: Install Checkov
@@ -76,5 +76,5 @@ jobs:
         run: |
           while read -r module; do
             echo "Running Checkov on modules/$module"
-            checkov --directory "modules/$module" --framework terraform --download-external-modules true
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
           done < changed_modules.txt
