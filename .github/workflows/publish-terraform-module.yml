@@ -65,6 +65,7 @@ jobs:
             NEW_TAG="$module-v$SEMVER"
             echo "New tag for $module is $NEW_TAG"
             echo "new_tag_$module=$NEW_TAG" >> $GITHUB_ENV
+            echo "new_tag_$module=$SEMVER" >> $GITHUB_ENV
           done
 
       - name: Create GitHub Release
