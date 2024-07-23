@@ -66,7 +66,7 @@ jobs:
         done < changed_modules.txt
 
     - name: Install Checkov
-      run: pip install checkov    
+      run: pip install checkov
 
     - name: Run Checkov action
       run: |
