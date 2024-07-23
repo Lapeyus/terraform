@@ -15,15 +15,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2
+          fetch-depth: 2  # Fetching the full history
 
-    #   - name: Set up Node.js
-    #     uses: actions/setup-node@v2
-    #     with:
-    #       node-version: '14'
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-    #   - name: Install jq
-    #     run: sudo apt-get install jq
+      - name: Install jq
+        run: sudo apt-get install jq
 
       - name: Detect Changed Modules
         id: changes
@@ -47,7 +47,7 @@ jobs:
             cd ../..
           done
 
-      - name: Get Semver from Commit Messages
+      - name: Get Semver from Commit Messages or Increment Version
         id: get_semver
         run: |
           for module in ${{ env.changed_modules }}; do
@@ -59,7 +59,11 @@ jobs:
                 SEMVER="1.0.0"
               else
                 VERSION=$(echo $LATEST_TAG | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+')
-                SEMVER="$(echo $VERSION | awk -F. '{print $1"."$2"."$3+1}')"
+                MAJOR=$(echo $VERSION | cut -d. -f1)
+                MINOR=$(echo $VERSION | cut -d. -f2)
+                PATCH=$(echo $VERSION | cut -d. -f3)
+                PATCH=$((PATCH + 1))
+                SEMVER="$MAJOR.$MINOR.$PATCH"
               fi
             fi
             NEW_TAG="$module-v$SEMVER"
