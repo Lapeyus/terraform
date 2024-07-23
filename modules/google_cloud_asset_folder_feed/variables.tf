@@ -15,3 +15,4 @@ variable "folder_feed_config" {
 variable "project_name" {
   type = string
 }
+
