@@ -62,7 +62,7 @@ jobs:
     - name: Run TFLint
       run: |
         while read -r module; do
-          tflint --chdir="$module" -f compact
+          tflint --chdir="modules/$module" -f compact
         done < changed_modules.txt
 
     - name: Install Checkov
@@ -71,6 +71,6 @@ jobs:
     - name: Run Checkov action
       run: |
         while read -r module; do
-          echo "Running Checkov on $module"
-          checkov --directory "$module" --framework terraform --download-external-modules true
+          echo "Running Checkov on modules/$module"
+          checkov --directory "modules/$module" --framework terraform --download-external-modules true
         done < changed_modules.txt
