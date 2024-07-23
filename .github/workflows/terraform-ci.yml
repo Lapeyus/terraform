@@ -66,13 +66,11 @@ jobs:
         done < changed_modules.txt
 
     - name: Run Checkov action
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: ${{ 'modules/' + module }}
-        framework: terraform
-        output_format: sarif
-        output_file_path: reports/results.sarif
-        download_external_modules: true
+      run: |
+          while read -r module; do
+            echo "Running Checkov on modules/$module"
+            checkov --directory "modules/$module" --framework terraform --output-format sarif --output-file-path "modules/$module/reports/results.sarif" --download-external-modules true
+          done < changed_modules.txt
 
     # - name: Run Checkov action
     #   run: |
