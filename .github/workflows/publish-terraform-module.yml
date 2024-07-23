@@ -74,7 +74,7 @@ jobs:
           for module in ${{ env.changed_modules }}; do
             NEW_TAG=$(printenv new_tag_$module)
             echo "Creating release for $module with tag $NEW_TAG"
-            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release $NEW_TAG" -n "Release for module $module"
+            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module Release $NEW_TAG" -n "Release for module $module"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
