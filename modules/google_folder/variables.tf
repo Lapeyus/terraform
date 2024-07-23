@@ -1,8 +1,10 @@
 variable "folders" {
   type = map(object({
-    display_name = string
-    parent       = string
-    parent_key   = string
+    name               = optional(string)
+    external_parent_id = optional(string)
+    parent_entry_key   = optional(string)
+    iam                = optional(map(list(string)))
+    iam_mode           = optional(string)
   }))
   default = {}
 }
