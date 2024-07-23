@@ -35,7 +35,7 @@ jobs:
           echo "No changes detected in the modules folder. Exiting."
           exit 1
 
-      - name: Compress and Upload Changed Modules
+      - name: Compress Changed Modules
         if: env.changed_modules != ''
         run: |
           for module in ${{ env.changed_modules }}; do
@@ -50,5 +50,16 @@ jobs:
           for module in ${{ env.changed_modules }}; do
             gh release create "v1.0.0-$module" "modules/$module/$module.tar.gz" -t "Module $module Release" -n "Release for module $module"
           done
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+
+      - name: Upload Release Assets
+        if: env.changed_modules != ''
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: modules/${{ env.changed_modules }}/module.tar.gz
+          asset_name: module-${{ env.changed_modules }}.tar.gz
+          asset_content_type: application/gzip
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
