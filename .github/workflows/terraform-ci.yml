@@ -1,0 +1,72 @@
+name: Terraform CI
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - 'modules/**'
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Detect Changed Modules
+      id: changes
+      run: |
+        CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
+        echo "Changed modules: $CHANGED_MODULES"
+        echo "$CHANGED_MODULES" > changed_modules.txt
+
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.9.2
+
+    - name: Terraform Init
+      run: terraform init
+
+    - name: Terraform Validate
+      run: |
+        while read -r module; do
+          terraform validate "modules/$module"
+        done < changed_modules.txt
+
+    - name: Terraform Format Check
+      run: |
+        while read -r module; do
+          terraform fmt -check "modules/$module"
+        done < changed_modules.txt
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+    - name: TFLint
+      run: |
+        while read -r module; do
+          tflint "modules/$module"
+        done < changed_modules.txt
+
+    - name: Install Checkov
+      run: pip install checkov
+
+    - name: Checkov Scan
+      run: |
+        while read -r module; do
+          checkov -d "modules/$module"
+        done < changed_modules.txt
+
+    - name: Run Terraform Tests
+      run: |
+        while read -r module; do
+          if [ -d "modules/$module/tests" ]; then
+            for test in "modules/$module/tests"/*.sh; do
+              bash "$test"
+            done
+          fi
+        done < changed_modules.txt
