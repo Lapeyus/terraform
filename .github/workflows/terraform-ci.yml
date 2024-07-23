@@ -75,19 +75,16 @@ jobs:
             checkov --directory "modules/$module" --framework terraform --download-external-modules true
           done < changed_modules.txt
 
+    - name: Run Checkov action
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: |
+          while read -r module; do
+            echo "modules/$module"
+          done < changed_modules.txt
+        framework: terraform
+        download_external_modules: true
 
-    # - name: Run Checkov action
-    #   run: |
-    #     while read -r module; do
-    #       echo "Running Checkov on modules/$module"
-    #       uses: bridgecrewio/checkov-action@master
-    #       with:
-    #         directory: "modules/$module"
-    #         framework: terraform
-    #         output_format: sarif
-    #         output_file_path: "modules/$module/reports/results.sarif"
-    #         download_external_modules: true
-    #     done < changed_modules.txt
 
     # - name: Set up Test Matrix
     #   id: matrix-setup
