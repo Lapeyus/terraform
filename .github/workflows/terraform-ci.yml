@@ -31,19 +31,19 @@ jobs:
     - name: Terraform Init
       run: |
         while read -r module; do
-          terraform -chdir="$module" init
+          terraform -chdir="modules/$module" init
         done < changed_modules.txt
 
     - name: Terraform Validate
       run: |
         while read -r module; do
-          terraform -chdir="$module" validate
+          terraform -chdir="modules/$module" validate
         done < changed_modules.txt
 
     - name: Terraform Format Check
       run: |
         while read -r module; do
-          terraform -chdir="$module" fmt -check
+          terraform -chdir="modules/$module" fmt -check
         done < changed_modules.txt
 
     - uses: terraform-linters/setup-tflint@v4
