@@ -23,6 +23,9 @@ jobs:
         echo "Changed modules: $CHANGED_MODULES"
         echo "$CHANGED_MODULES" > changed_modules.txt
 
+    - name: Debug Changed Modules
+      run: cat changed_modules.txt
+
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
       with:
@@ -31,19 +34,19 @@ jobs:
     - name: Terraform Init
       run: |
         while read -r module; do
-          terraform -chdir="modules/$module" init
+          terraform -chdir="$module" init
         done < changed_modules.txt
 
     - name: Terraform Validate
       run: |
         while read -r module; do
-          terraform -chdir="modules/$module" validate
+          terraform -chdir="$module" validate
         done < changed_modules.txt
 
     - name: Terraform Format Check
       run: |
         while read -r module; do
-          terraform -chdir="modules/$module" fmt -check
+          terraform -chdir="$module" fmt -check
         done < changed_modules.txt
 
     - uses: terraform-linters/setup-tflint@v4
@@ -62,7 +65,7 @@ jobs:
     - name: Run TFLint
       run: |
         while read -r module; do
-          tflint --chdir="modules/$module" -f compact
+          tflint --chdir="$module" -f compact
         done < changed_modules.txt
 
     - name: Install Checkov
@@ -71,6 +74,6 @@ jobs:
     - name: Run Checkov action
       run: |
         while read -r module; do
-          echo "Running Checkov on modules/$module"
-          checkov --directory "modules/$module" --framework terraform --download-external-modules true
+          echo "Running Checkov on $module"
+          checkov --directory "$module" --framework terraform --download-external-modules true
         done < changed_modules.txt
