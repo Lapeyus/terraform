@@ -44,7 +44,6 @@ jobs:
       - name: Get Semver from Commit Messages or Increment Version
         id: get_semver
         run: |
-          echo "module,version" > module_versions.txt
           for module in $(cat changed_modules.txt); do
             echo "Processing module: $module"
             SEMVER=$(git log -1 --pretty=%B | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
@@ -54,7 +53,7 @@ jobs:
               LATEST_TAG=$(git tag -l "$module-v*" | sort -V | tail -n 1)
               echo "Latest tag for $module: $LATEST_TAG"
               if [ -z "$LATEST_TAG" ]; then
-                SEMVER="1.0.0"
+                SEMVER="0.0.1"
               else
                 VERSION=$(echo $LATEST_TAG | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+')
                 echo "Parsed version: $VERSION"
@@ -69,17 +68,7 @@ jobs:
             NEW_TAG="$module-v$SEMVER"
             echo "New tag for $module is $NEW_TAG"
             echo "$module=$NEW_TAG" >> new_tags.txt
-            echo "$module,$SEMVER" >> module_versions.txt
           done
-
-      - name: Bump Module Versions
-        id: bump_version
-        uses: haya14busa/action-bumpr@v1
-        with:
-          bump_each_file: true
-          files: module_versions.txt
-          format: "${{ env.module }}-v${{ env.version }}"
-          default_bump_level: patch
 
       - name: Set New Tags Environment Variable
         run: |
