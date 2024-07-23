@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Detect Changed Modules
       id: changes
@@ -24,7 +24,7 @@ jobs:
         echo "$CHANGED_MODULES" > changed_modules.txt
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.0.0
 
@@ -46,41 +46,49 @@ jobs:
           terraform -chdir="modules/$module" fmt -check
         done < changed_modules.txt
 
-    - name: Install TFLint
-      run: |
-        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+    - uses: terraform-linters/setup-tflint@v4
+      name: Setup TFLint
+      with:
+        tflint_version: v0.50.3
 
-    - name: TFLint
+    - name: Show version
+      run: tflint --version
+
+    - name: Init TFLint
+      run: tflint --init
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run TFLint
       run: |
         while read -r module; do
-          tflint --chdir="modules/$module"
+          tflint --chdir="modules/$module" -f compact
         done < changed_modules.txt
 
-    - name: Install Checkov
-      run: pip install checkov
-
     - name: Run Checkov action
-      id: checkov
-      uses: bridgecrewio/checkov-action@master
-      with:
-        directory: .
-        framework: terraform
-        output_format: sarif
-        output_file_path: reports/results.sarif
-        download_external_modules: true
-
-    - name: Set up Test Matrix
-      id: matrix-setup
       run: |
-        LOCATIONS=("swedencentral" "westeurope" "northeurope")
-        VERSIONS=("1.1.0" "1.2.0" "1.3.0")
-        for module in $(cat changed_modules.txt); do
-          for location in "${LOCATIONS[@]}"; do
-            for version in "${VERSIONS[@]}"; do
-              echo "$module $location $version" >> test_matrix.txt
-            done
-          done
-        done
+        while read -r module; do
+          echo "Running Checkov on modules/$module"
+          uses: bridgecrewio/checkov-action@master
+          with:
+            directory: "modules/$module"
+            framework: terraform
+            output_format: sarif
+            output_file_path: "modules/$module/reports/results.sarif"
+            download_external_modules: true
+        done < changed_modules.txt
+
+    # - name: Set up Test Matrix
+    #   id: matrix-setup
+    #   run: |
+    #     LOCATIONS=("swedencentral" "westeurope" "northeurope")
+    #     VERSIONS=("1.1.0" "1.2.0" "1.3.0")
+    #     for module in $(cat changed_modules.txt); do
+    #       for location in "${LOCATIONS[@]}"; do
+    #         for version in "${VERSIONS[@]}"; do
+    #           echo "$module $location $version" >> test_matrix.txt
+    #         done
+    #       done
 
     # - name: Run Terraform Tests
     #   run: |
