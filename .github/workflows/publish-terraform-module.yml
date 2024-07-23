@@ -24,14 +24,14 @@ jobs:
           echo "Changed modules: $CHANGED_MODULES"
           echo "$CHANGED_MODULES" > changed_modules.txt
 
-      - name: Fail if no changes detected
-        if: ${{ steps.changes.outputs.changed_modules == '' }}
+      - name: Exit if no changes detected
         run: |
-          echo "No changes detected in the modules folder. Exiting."
-          exit 1
+          if [ ! -s changed_modules.txt ]; then
+            echo "No changes detected in the modules folder. Exiting."
+            exit 0
+          fi
 
       - name: Compress Changed Modules
-        if: ${{ steps.changes.outputs.changed_modules != '' }}
         run: |
           for module in $(cat changed_modules.txt); do
             cd modules/$module
@@ -75,7 +75,6 @@ jobs:
           done < new_tags.txt
 
       - name: Create GitHub Release
-        if: ${{ steps.changes.outputs.changed_modules != '' }}
         run: |
           for module in $(cat changed_modules.txt); do
             NEW_TAG=$(printenv $module)
