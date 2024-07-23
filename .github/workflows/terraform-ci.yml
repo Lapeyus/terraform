@@ -72,8 +72,9 @@ jobs:
       run: |
           while read -r module; do
             echo "Running Checkov on modules/$module"
-            checkov --directory "modules/$module" --framework terraform --output-format sarif --output-file-path "modules/$module/reports/results.sarif" --download-external-modules true
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true
           done < changed_modules.txt
+
 
     # - name: Run Checkov action
     #   run: |
