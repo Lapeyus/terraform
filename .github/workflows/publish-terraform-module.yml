@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths: 
-      - 'modules/**'   
+      - 'modules/**'
   workflow_dispatch:
 
 jobs:
@@ -15,30 +15,61 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for tags
 
       - name: Detect Changed Modules
         id: changes
         run: |
-          CHANGED_MODULES=$(git diff --name-only HEAD^ | grep '^modules/' | cut -d'/' -f2 | sort -u)
+          CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
-          echo "$CHANGED_MODULES" >> changed_modules.txt
+          echo "$CHANGED_MODULES" > changed_modules.txt
 
       - name: Exit if no changes detected
-        if: steps.changes.outputs.CHANGED_MODULES == ''
-        run: echo "No changes detected in the modules folder. Exiting."
+        run: |
+          if [ ! -s changed_modules.txt ]; then
+            echo "No changes detected in the modules folder. Exiting."
+            exit 0
+          fi
 
-      - name: Get Latest Module Version (if exists)
-        id: get_version
+      - name: Compress Changed Modules
         run: |
           for module in $(cat changed_modules.txt); do
-            LATEST_TAG=$(git tag --list "${module}-v*" --sort=-v:refname | head -n1)
-            if [ -n "$LATEST_TAG" ]; then
-              VERSION=${LATEST_TAG#"$module-v"} 
-              echo "$module=$VERSION" >> module_versions.txt
-            else
-              echo "$module=0.0.0" >> module_versions.txt
+            cd modules/$module
+            tar -czvf ../../${module}.tar.gz *
+            cd ../..
+          done
+
+      - name: Get Semver from Commit Messages or Increment Version
+        id: get_semver
+        run: |
+          echo "module,version" > module_versions.txt
+          for module in $(cat changed_modules.txt); do
+            echo "Processing module: $module"
+            SEMVER=$(git log -1 --pretty=%B | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1)
+            echo "Found SEMVER in commit message: $SEMVER"
+            if [ -z "$SEMVER" ]; then
+              echo "No semver found in commit messages. Using latest tag logic."
+              LATEST_TAG=$(git tag -l "$module-v*" | sort -V | tail -n 1)
+              echo "Latest tag for $module: $LATEST_TAG"
+              if [ -z "$LATEST_TAG" ]; then
+                SEMVER="1.0.0"
+              else
+                VERSION=$(echo $LATEST_TAG | grep -o -E '[0-9]+\.[0-9]+\.[0-9]+')
+                echo "Parsed version: $VERSION"
+                MAJOR=$(echo $VERSION | cut -d. -f1)
+                MINOR=$(echo $VERSION | cut -d. -f2)
+                PATCH=$(echo $VERSION | cut -d. -f3)
+                PATCH=$((PATCH + 1))
+                SEMVER="$MAJOR.$MINOR.$PATCH"
+                echo "Incremented version: $SEMVER"
+              fi
             fi
+            NEW_TAG="$module-v$SEMVER"
+            echo "New tag for $module is $NEW_TAG"
+            echo "$module=$NEW_TAG" >> new_tags.txt
+            echo "$module,$SEMVER" >> module_versions.txt
           done
 
       - name: Bump Module Versions
@@ -47,19 +78,21 @@ jobs:
         with:
           bump_each_file: true
           files: module_versions.txt
-          format: "${module}-v${version}"
-          default_bump_level: patch  
+          format: "${{module}}-v${{version}}"
+          default_bump_level: patch
 
-      - name: Publish Modules
+      - name: Set New Tags Environment Variable
+        run: |
+          while read line; do
+            echo "$line" >> $GITHUB_ENV
+          done < new_tags.txt
+
+      - name: Create GitHub Release
         run: |
           for module in $(cat changed_modules.txt); do
-            NEW_TAG=$(grep "^${module}=" module_versions.txt | cut -d= -f2)
-
-            # Create release and upload archive
-            gh release create "$NEW_TAG" \
-              "modules/${module}" \
-              --title "Module Release $NEW_TAG" \
-              --notes "Release for module $module"
+            NEW_TAG=$(printenv $module)
+            echo "Creating release for $module with tag $NEW_TAG"
+            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module Release $NEW_TAG" -n "Release for module $module"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
