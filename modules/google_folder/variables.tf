@@ -8,4 +8,3 @@ variable "folders" {
   }))
   default = {}
 }
-
