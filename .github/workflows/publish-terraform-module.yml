@@ -51,4 +51,4 @@ jobs:
             gh release create "v1.0.0-$module" "modules/$module/$module.tar.gz" -t "Module $module Release" -n "Release for module $module"
           done
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
