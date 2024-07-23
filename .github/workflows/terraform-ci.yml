@@ -24,7 +24,9 @@ jobs:
         echo "$CHANGED_MODULES" > changed_modules.txt
 
     - name: Debug Changed Modules
-      run: cat changed_modules.txt
+      run: |
+        echo "Changed modules:"
+        cat changed_modules.txt
 
     - name: Set up Terraform
       uses: hashicorp/setup-terraform@v3
@@ -34,19 +36,22 @@ jobs:
     - name: Terraform Init
       run: |
         while read -r module; do
-          terraform -chdir="$module" init
+          echo "Initializing module: modules/$module"
+          terraform -chdir="modules/$module" init
         done < changed_modules.txt
 
     - name: Terraform Validate
       run: |
         while read -r module; do
-          terraform -chdir="$module" validate
+          echo "Validating module: modules/$module"
+          terraform -chdir="modules/$module" validate
         done < changed_modules.txt
 
     - name: Terraform Format Check
       run: |
         while read -r module; do
-          terraform -chdir="$module" fmt -check
+          echo "Formatting check for module: modules/$module"
+          terraform -chdir="modules/$module" fmt -check
         done < changed_modules.txt
 
     - uses: terraform-linters/setup-tflint@v4
@@ -65,6 +70,7 @@ jobs:
     - name: Run TFLint
       run: |
         while read -r module; do
+          echo "Running TFLint on module: $module"
           tflint --chdir="$module" -f compact
         done < changed_modules.txt
 
