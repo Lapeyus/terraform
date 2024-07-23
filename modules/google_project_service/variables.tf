@@ -5,7 +5,3 @@ variable "enabled_services" {
 variable "gcp_project" {
   type = string
 }
-
-
-
-
