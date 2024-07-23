@@ -44,14 +44,17 @@ jobs:
             cd ../..
           done
 
-      - name: Create GitHub Releases
+      - name: Create GitHub Release
         if: env.changed_modules != ''
-        run: |
-          for module in ${{ env.changed_modules }}; do
-            gh release create "v1.0.0-$module" "modules/$module/$module.tar.gz" -t "Module $module Release" -n "Release for module $module"
-          done
+        id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
+        with:
+          tag_name: "v1.0.0-${{ env.changed_modules }}"
+          release_name: "Module ${{ env.changed_modules }} Release"
+          draft: false
+          prerelease: false
 
       - name: Upload Release Assets
         if: env.changed_modules != ''
