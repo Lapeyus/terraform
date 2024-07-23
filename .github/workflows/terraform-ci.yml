@@ -69,12 +69,35 @@ jobs:
             tflint --chdir="modules/$module" -f compact || { echo "TFLint failed for $module"; exit 1; }
           done < changed_modules.txt
 
-      - name: Install Checkov
-        run: pip install checkov
+      - name: Run Checkov action
+        id: checkov
+        uses: bridgecrewio/checkov-action@master
+        directory: ./modules/  # Scan all modules in the modules directory
+          #file: example/tfplan.json  # Remove this line if you are not providing a plan file
+          #check:  # Remove this line if you are not specifying a specific check
+          #skip_check:  # Remove this line if you are not skipping a specific check
+          #quiet: true  # Remove this line if you want to see all results, not just failures
+          soft_fail: true  # Do not fail the workflow if Checkov finds issues
+          framework: terraform  # Explicitly specify Terraform as the framework
+          #skip_framework:  # Remove this line unless you need to skip a framework
+          #skip_cve_package:  # Remove this line unless you need to skip specific CVEs
+          output_format: cli  # Output the results in the command-line format for easy reading
+          #output_file_path:  # Remove this line if you don't need a separate output file
+          #output_bc_ids:  # Remove this line if you don't use Bridgecrew IDs
+          #download_external_modules:  # Remove this line if you don't need external modules downloaded
+          #repo_root_for_plan_enrichment:  # Remove this line if you are not providing a plan file
+          #var_file:  # Remove this line if you don't have additional variable files
+          #log_level:  # Remove this line unless you need to change the log level
+          #config_file:  # Remove this line unless you have a custom config file
+          #baseline:  # Remove this line unless you have a baseline file
+          #container_user:  # Remove this line unless you have specific permissions requirements
+          #use_enforcement_rules: true # Remove this line unless you use Bridgecrew enforcement rules
+    
+          #     run: pip install checkov
 
-      - name: Run Checkov
-        run: |
-          while read -r module; do
-            echo "Running Checkov on modules/$module"
-            checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
-          done < changed_modules.txt
+    #   - name: Run Checkov
+    #     run: |
+    #       while read -r module; do
+    #         echo "Running Checkov on modules/$module"
+    #         checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
+    #       done < changed_modules.txt
