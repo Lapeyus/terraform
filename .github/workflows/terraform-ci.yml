@@ -18,11 +18,17 @@ jobs:
       - name: Detect Changed Modules
         id: changes
         run: |
-          git fetch origin main:refs/remotes/origin/main
-          CHANGED_MODULES=$(git diff --name-only origin/main...HEAD | grep '^modules/' | cut -d'/' -f1,2 | sort -u)
+          git fetch origin main:refs/remotes/origin/main || true
+          CHANGED_MODULES=$(git diff --name-only origin/main...HEAD || git diff --name-only HEAD)
+          CHANGED_MODULES=$(echo "$CHANGED_MODULES" | grep '^modules/' | cut -d'/' -f1,2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
           echo "$CHANGED_MODULES" > changed_modules.txt
           echo "::set-output name=changed_modules::$CHANGED_MODULES"
+
+      - name: Debug Changed Modules
+        run: |
+          echo "Changed modules:"
+          cat changed_modules.txt
 
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
@@ -40,9 +46,11 @@ jobs:
         run: |
           while read -r module; do
             echo "Processing module: $module"
-            terraform -chdir="$module" init -upgrade
-            terraform -chdir="$module" validate
-            terraform -chdir="$module" fmt -check
+            if [ -n "$module" ]; then
+              terraform -chdir="$module" init -upgrade
+              terraform -chdir="$module" validate
+              terraform -chdir="$module" fmt -check
+            fi
           done < changed_modules.txt
 
       - name: Setup TFLint
@@ -54,7 +62,9 @@ jobs:
         run: |
           while read -r module; do
             echo "Running TFLint on module: $module"
-            tflint --chdir="$module" -f compact
+            if [ -n "$module" ]; then
+              tflint --chdir="$module" -f compact
+            fi
           done < changed_modules.txt
 
       - name: Install Checkov
@@ -64,5 +74,7 @@ jobs:
         run: |
           while read -r module; do
             echo "Running Checkov on $module"
-            checkov --directory "$module" --framework terraform --download-external-modules true
+            if [ -n "$module" ]; then
+              checkov --directory "$module" --framework terraform --download-external-modules true
+            fi
           done < changed_modules.txt
