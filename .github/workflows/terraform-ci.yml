@@ -65,6 +65,9 @@ jobs:
           tflint --chdir="modules/$module" -f compact
         done < changed_modules.txt
 
+    - name: Install Checkov
+      run: pip install checkov    
+    
     - name: Run Checkov action
       run: |
           while read -r module; do
