@@ -1,4 +1,4 @@
-output "id" {
-  value = local.folder_id
-}
+# output "id" {
+#   value = local.folder_id
+# }
 
