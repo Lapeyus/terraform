@@ -23,16 +23,15 @@ jobs:
           CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
           echo "$CHANGED_MODULES" > changed_modules.txt
-          echo "changed_modules=$(cat changed_modules.txt)" >> $GITHUB_ENV
 
       - name: Fail if no changes detected
-        if: env.changed_modules == ''
+        if: ${{ steps.changes.outputs.changed_modules == '' }}
         run: |
           echo "No changes detected in the modules folder. Exiting."
           exit 1
 
       - name: Compress Changed Modules
-        if: env.changed_modules != ''
+        if: ${{ steps.changes.outputs.changed_modules != '' }}
         run: |
           for module in $(cat changed_modules.txt); do
             cd modules/$module
@@ -76,7 +75,7 @@ jobs:
           done < new_tags.txt
 
       - name: Create GitHub Release
-        if: env.changed_modules != ''
+        if: ${{ steps.changes.outputs.changed_modules != '' }}
         run: |
           for module in $(cat changed_modules.txt); do
             NEW_TAG=$(printenv $module)

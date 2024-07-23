@@ -35,4 +35,3 @@ variable "sub_networks" {
   default     = []
   description = "A list of subnetwork configurations."
 }
-
