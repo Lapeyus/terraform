@@ -81,8 +81,9 @@ jobs:
           for module in $(cat changed_modules.txt); do
             NEW_TAG=$(printenv $module)
             echo "Creating release for $module with tag $NEW_TAG"
-            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module Release $NEW_TAG" -n "Release for module $module"
+            gh release create "$NEW_TAG" "${module}.tar.gz" --generate-notes
           done
         env:
             GITHUB_TOKEN: ${{ secrets.PAT }}
 
+            #-t "Module Release $NEW_TAG" -n "Release for module $module"
