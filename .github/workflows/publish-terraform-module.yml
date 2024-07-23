@@ -78,7 +78,7 @@ jobs:
         with:
           bump_each_file: true
           files: module_versions.txt
-          format: "${{module}}-v${{version}}"
+          format: "${{ env.module }}-v${{ env.version }}"
           default_bump_level: patch
 
       - name: Set New Tags Environment Variable
