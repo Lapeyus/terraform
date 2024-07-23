@@ -17,13 +17,13 @@ jobs:
         with:
           fetch-depth: 2  # Fetching the full history
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
+    #   - name: Set up Node.js
+    #     uses: actions/setup-node@v2
+    #     with:
+    #       node-version: '14'
 
-      - name: Install jq
-        run: sudo apt-get install jq
+    #   - name: Install jq
+    #     run: sudo apt-get install jq
 
       - name: Detect Changed Modules
         id: changes
