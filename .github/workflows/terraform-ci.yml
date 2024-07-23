@@ -57,9 +57,9 @@ jobs:
           
       - name: Run Checkov
         uses: bridgecrewio/checkov-action@master
-        if: steps.changes.outputs.changed_modules != '[]'
+        if: steps.changes.outputs.changed_modules != ''
         with:
-          directory: modules/${{ join(fromJSON(steps.changes.outputs.changed_modules), ',modules/') }} 
+          directory: modules/${{ steps.changes.outputs.changed_modules }}          
           framework: terraform
           download_external_modules: true
 
