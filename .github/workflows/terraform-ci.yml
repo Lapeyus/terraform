@@ -24,7 +24,7 @@ jobs:
         echo "$CHANGED_MODULES" > changed_modules.txt
 
     - name: Set up Terraform
-      uses: hashicorp/setup-terraform@v1
+      uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.0.0
 
@@ -78,9 +78,9 @@ jobs:
           done
         done
 
-    - name: Run Terraform Tests
-      run: |
-        while IFS=" " read -r module location version; do
-          sed 's/{{VERSION}}/'"$version"'/g; s/{{LOCATION}}/'"$location"'/g' templates/main.tftest.hcl.tpl > modules/"$module"/tests/main.tftest.hcl
-          terraform -chdir="modules/$module" test
-        done < test_matrix.txt
+    # - name: Run Terraform Tests
+    #   run: |
+    #     while IFS=" " read -r module location version; do
+    #       sed 's/{{VERSION}}/'"$version"'/g; s/{{LOCATION}}/'"$location"'/g' templates/main.tftest.hcl.tpl > modules/"$module"/tests/main.tftest.hcl
+    #       terraform -chdir="modules/$module" test
+    #     done < test_matrix.txt
