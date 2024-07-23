@@ -14,6 +14,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 2  # Fetching the full history
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -25,27 +27,27 @@ jobs:
         run: |
           CHANGED_MODULES=$(git diff --name-only HEAD~1 HEAD | grep '^modules/' | cut -d'/' -f2 | sort -u)
           echo "Changed modules: $CHANGED_MODULES"
-          echo "::set-output name=changed_modules::$CHANGED_MODULES"
+          echo "changed_modules=$CHANGED_MODULES" >> $GITHUB_ENV
 
       - name: Fail if no changes detected
-        if: steps.changes.outputs.changed_modules == ''
+        if: env.changed_modules == ''
         run: |
           echo "No changes detected in the modules folder. Exiting."
           exit 1
 
       - name: Compress and Upload Changed Modules
-        if: steps.changes.outputs.changed_modules != ''
+        if: env.changed_modules != ''
         run: |
-          for module in ${{ steps.changes.outputs.changed_modules }}; do
+          for module in ${{ env.changed_modules }}; do
             cd modules/$module
             tar -czvf $module.tar.gz *
             cd ../..
           done
 
       - name: Create GitHub Releases
-        if: steps.changes.outputs.changed_modules != ''
+        if: env.changed_modules != ''
         run: |
-          for module in ${{ steps.changes.outputs.changed_modules }}; do
+          for module in ${{ env.changed_modules }}; do
             gh release create "v1.0.0-$module" "modules/$module/$module.tar.gz" -t "Module $module Release" -n "Release for module $module"
           done
         env:
