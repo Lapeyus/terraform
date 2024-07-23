@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-          fetch-depth: 2  # Fetching the full history
+          fetch-depth: 2
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
@@ -72,7 +72,7 @@ jobs:
         run: |
           for module in ${{ env.changed_modules }}; do
             NEW_TAG=$(printenv new_tag_$module)
-            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release" -n "Release for module $module"
+            gh release create "$NEW_TAG" "${module}.tar.gz" -t "Module $module Release $SEMVER" -n "Release for module $module"
           done
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
