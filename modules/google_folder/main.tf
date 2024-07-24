@@ -104,4 +104,3 @@ resource "google_folder" "layer10_folders" {
   parent       = google_folder.layer9_folders[each.value.parent_entry_key].name
   depends_on   = [google_folder.layer9_folders]
 }
-
