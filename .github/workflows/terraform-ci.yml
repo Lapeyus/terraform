@@ -15,7 +15,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch all history for detecting changes
+          fetch-depth: 0
 
       - name: Detect Changed Modules
         id: changes
@@ -69,11 +69,12 @@ jobs:
             tflint --chdir="modules/$module" -f compact || { echo "TFLint failed for $module"; exit 1; }
           done < changed_modules.txt
 
-      - name: Run Checkov action
-        id: checkov
-        uses: bridgecrewio/checkov-action@master
-        with:
-          directory: ./modules/$module
-          soft_fail: true
-          framework: terraform
-          output_format: cli
+      - name: Install Checkov
+        run: pip install checkov
+
+      - name: Run Checkov
+        run: |
+          while read -r module; do
+            echo "Running Checkov on modules/$module"
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
+          done < changed_modules.txt
