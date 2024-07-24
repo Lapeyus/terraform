@@ -52,4 +52,3 @@ output "layer9_folders" {
 output "layer10_folders" {
   value = { for k, v in google_folder.layer10_folders : k => v.name }
 }
-
