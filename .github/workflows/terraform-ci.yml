@@ -14,8 +14,8 @@ jobs:
     env:
       TERRAFORM_VERSION: 1.9.2
       TFLINT_VERSION: v0.50.3
-      CACHE_KEY: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
       CHECKOV_VERSION: latest
+      CACHE_KEY_PREFIX: ${{ runner.os }}-terraform
 
     steps:
       - name: Checkout repository
@@ -51,8 +51,8 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.terraform.d/plugins
-          key: ${{ env.CACHE_KEY }}
-          restore-keys: ${{ runner.os }}-terraform-
+          key: ${{ env.CACHE_KEY_PREFIX }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: ${{ env.CACHE_KEY_PREFIX }}-
 
       - name: Terraform Init, Validate, and Format Check
         run: |
