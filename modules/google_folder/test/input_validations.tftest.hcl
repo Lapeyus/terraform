@@ -49,20 +49,20 @@ run "invalid_folders" {
   }
 
   assert {
-    condition     = (
-      folders["invalid1"].external_parent_id == null &&
-      folders["invalid1"].parent_entry_key == null &&
-      folders["invalid2"].parent_entry_key == "layer1" &&
-      folders["invalid3"].name == "Invalid 3!" &&
-      folders["invalid4"].external_parent_id == "org/123456789"
+    condition = (
+      var.folders["invalid1"].external_parent_id == null &&
+      var.folders["invalid1"].parent_entry_key == null &&
+      var.folders["invalid2"].parent_entry_key == "layer1" &&
+      var.folders["invalid3"].name == "Invalid 3!" &&
+      var.folders["invalid4"].external_parent_id == "org/123456789"
     )
     error_message = "Expected failures did not occur for invalid folders"
   }
 
   expect_failures = [
-    "folders.invalid1",
-    "folders.invalid2",
-    "folders.invalid3",
-    "folders.invalid4",
+    var.folders.invalid1,
+    var.folders.invalid2,
+    var.folders.invalid3,
+    var.folders.invalid4,
   ]
 }
