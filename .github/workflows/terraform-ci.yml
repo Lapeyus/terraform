@@ -9,11 +9,13 @@ on:
 
 jobs:
   terraform:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
       TERRAFORM_VERSION: 1.9.2
       TFLINT_VERSION: v0.52.0
+      CHECKOV_VERSION: 3.2.201
+
 
     steps:
       - name: Checkout repository
@@ -75,7 +77,7 @@ jobs:
           done < changed_modules.txt
 
       - name: Install Checkov
-        run: pip install checkov
+        run: pip install checkov==${{ env.CHECKOV_VERSION }}
 
       - name: Run Checkov
         run: |
