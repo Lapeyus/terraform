@@ -1,4 +1,8 @@
 # test/input_validations.tftest.hcl
+provider "google" {
+  project = "kerewes-root-613169ca279cb281"
+  region  = "us-central1"
+}
 
 variables {
   folders = {
