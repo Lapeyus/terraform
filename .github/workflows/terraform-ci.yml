@@ -108,18 +108,27 @@ jobs:
             tflint --chdir="modules/$module" -f compact || { echo "TFLint failed for $module"; exit 1; }
           done < changed_modules.txt
 
-    #   - name: Run Checkov
-    #     run: |
-    #       while read -r module; do
-    #         echo "Running Checkov on modules/$module"
-    #         checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
-    #       done < changed_modules.txt
+      - name: Run Checkov
+        run: |
+          while read -r module; do
+            echo "Running Checkov on modules/$module"
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true || { echo "Checkov failed for $module"; exit 1; }
+          done < changed_modules.txt
 
-      - name: Run Terraform Tests
+      - name: Run Terraform Unit Tests
         run: |
           while read -r module; do
             echo "Running Terraform tests on modules/$module"
             cd modules/$module
             terraform init -upgrade
-            terraform test -test-directory "test" || { echo "Terraform tests failed for $module"; exit 1; }
+            terraform test -test-directory "tests/unit/" || { echo "Terraform tests failed for $module"; exit 1; }
+          done < changed_modules.txt
+
+      - name: Run Terraform Integration Tests
+        run: |
+          while read -r module; do
+            echo "Running Terraform tests on modules/$module"
+            cd modules/$module
+            terraform init -upgrade
+            terraform test -test-directory "tests/integration/" || { echo "Terraform tests failed for $module"; exit 1; }
           done < changed_modules.txt
