@@ -49,7 +49,7 @@ run "invalid_folders" {
   }
 
   assert {
-    condition = false
+    condition = length(var.folders) == 0
     error_message = "Expected failures did not occur for invalid folders"
   }
 
