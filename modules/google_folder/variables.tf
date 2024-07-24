@@ -7,7 +7,7 @@ variable "folders" {
     iam_mode           = optional(string)
   }))
   default = {}
-  
+
   validation {
     condition = alltrue([
       for k, v in var.folders :
@@ -15,7 +15,7 @@ variable "folders" {
     ])
     error_message = "Each folder must have either 'external_parent_id' or 'parent_entry_key' defined."
   }
-  
+
   validation {
     condition = alltrue([
       for k, v in var.folders :
@@ -23,7 +23,7 @@ variable "folders" {
     ])
     error_message = "Each folder can have only one of 'external_parent_id' or 'parent_entry_key' defined, not both."
   }
-  
+
   validation {
     condition = alltrue([
       for k, v in var.folders :
@@ -37,7 +37,7 @@ variable "folders" {
     ])
     error_message = "Each folder name must start and end with a letter or digit, may contain letters, digits, spaces, hyphens, and underscores, and can be no longer than 30 characters."
   }
-  
+
   validation {
     condition = alltrue([
       for k, v in var.folders :
@@ -53,7 +53,7 @@ variable "folders" {
   }
 
   validation {
-    condition = length(distinct([for k, v in var.folders : v.name])) == length(var.folders)
+    condition     = length(distinct([for k, v in var.folders : v.name])) == length(var.folders)
     error_message = "Folder display names must be unique within the same level of the hierarchy."
   }
 
@@ -67,7 +67,7 @@ variable "folders" {
     ])
     error_message = "A parent folder cannot contain more than 300 direct child folders."
   }
-  
+
   validation {
     condition = alltrue([
       for k, v in var.folders :
