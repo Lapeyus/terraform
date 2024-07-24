@@ -13,8 +13,7 @@ jobs:
 
     env:
       TERRAFORM_VERSION: 1.9.2
-      TFLINT_VERSION: v0.50.3
-      CHECKOV_VERSION: latest
+      TFLINT_VERSION: v0.52.0
 
     steps:
       - name: Checkout repository
@@ -76,7 +75,7 @@ jobs:
           done < changed_modules.txt
 
       - name: Install Checkov
-        run: pip install checkov==${{ env.CHECKOV_VERSION }}
+        run: pip install checkov
 
       - name: Run Checkov
         run: |
