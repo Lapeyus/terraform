@@ -1,20 +1,20 @@
 # test/input_validations.tftest.hcl
 
-run "valid_folders" {
-  command = plan
-
-  variables {
-    folders = {
-      layer1 = {
-        name               = "Layer 1"
-        external_parent_id = "organizations/123456789"
-      }
-      layer2 = {
-        name               = "Layer 2"
-        parent_entry_key   = "layer1"
-      }
+variables {
+  folders = {
+    layer1 = {
+      name               = "Layer 1"
+      external_parent_id = "organizations/123456789"
+    }
+    layer2 = {
+      name               = "Layer 2"
+      parent_entry_key   = "layer1"
     }
   }
+}
+
+run "valid_folders" {
+  command = plan
 
   assert {
     condition     = length(var.folders) == 2
@@ -49,7 +49,13 @@ run "invalid_folders" {
   }
 
   assert {
-    condition = length(var.folders) == 0
+    condition     = (
+      folders["invalid1"].external_parent_id == null &&
+      folders["invalid1"].parent_entry_key == null &&
+      folders["invalid2"].parent_entry_key == "layer1" &&
+      folders["invalid3"].name == "Invalid 3!" &&
+      folders["invalid4"].external_parent_id == "org/123456789"
+    )
     error_message = "Expected failures did not occur for invalid folders"
   }
 
