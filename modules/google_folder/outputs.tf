@@ -1,4 +1,4 @@
-output "all_folders" {
+output "folders" {
   value = merge(
     { for k, v in google_folder.layer1_folders : k => v.name },
     { for k, v in google_folder.layer2_folders : k => v.name },
