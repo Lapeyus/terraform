@@ -4,6 +4,7 @@ resource "google_folder" "layer1_folders" {
   parent       = each.value.external_parent_id
 }
 
+
 locals {
   layer1_keys = keys(google_folder.layer1_folders)
 }
@@ -103,4 +104,3 @@ resource "google_folder" "layer10_folders" {
   parent       = google_folder.layer9_folders[each.value.parent_entry_key].name
   depends_on   = [google_folder.layer9_folders]
 }
-
