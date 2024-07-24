@@ -98,5 +98,7 @@ jobs:
         run: |
           while read -r module; do
             echo "Running Terraform tests on modules/$module"
-            terraform test -test-directory "modules/$module/test" || { echo "Terraform tests failed for $module"; exit 1; }
+            cd modules/$module
+            terraform init -upgrade
+            terraform test -test-directory "test" || { echo "Terraform tests failed for $module"; exit 1; }
           done < changed_modules.txt
