@@ -7,6 +7,10 @@ on:
     paths:
       - "modules/**"
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
