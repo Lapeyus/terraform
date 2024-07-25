@@ -112,7 +112,7 @@ jobs:
         run: |
           while read -r module; do
             echo "Running Checkov on modules/$module"
-            checkov --directory "modules/$module" --framework terraform --download-external-modules true --config-file /modules/.checkov.yml || { echo "Checkov failed for $module"; exit 1; }
+            checkov --directory "modules/$module" --framework terraform --download-external-modules true --config-file modules/.checkov.yml || { echo "Checkov failed for $module"; exit 1; }
           done < changed_modules.txt
       - name: Run Terraform Unit Tests
         run: |
