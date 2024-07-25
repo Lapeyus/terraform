@@ -1,7 +1,11 @@
 name: pre-commit-terraform
 
 on:
-  pull_request:
+  push:
+    branches-ignore:
+      - main
+# on:
+#   pull_request:
 
 jobs:
   pre-commit:
