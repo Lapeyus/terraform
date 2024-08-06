@@ -3,13 +3,13 @@
 variables {
   rules = [
     {
-      project                 = "example-project"
-      name                    = "valid-rule"
-      network                 = "dev"
-      priority                = 1000
-      direction               = "INGRESS"
-      source_ranges           = ["10.0.0.0/8"]
-      allow                   = {
+      project       = "example-project"
+      name          = "valid-rule"
+      network       = "dev"
+      priority      = 1000
+      direction     = "INGRESS"
+      source_ranges = ["10.0.0.0/8"]
+      allow = {
         protocol = "tcp"
         ports    = ["80", "443"]
       }
@@ -18,13 +18,13 @@ variables {
       }
     },
     {
-      project                 = "example-project"
-      name                    = "invalid-rule"
-      network                 = "prod"
-      priority                = 1000
-      direction               = "INGRESS"
-      source_ranges           = ["0.0.0.0/0"]
-      allow                   = {
+      project       = "example-project"
+      name          = "invalid-rule"
+      network       = "prod"
+      priority      = 1000
+      direction     = "INGRESS"
+      source_ranges = ["0.0.0.0/0"]
+      allow = {
         protocol = "tcp"
         ports    = ["80", "443"]
       }
@@ -39,7 +39,7 @@ run "valid_rule" {
   command = plan
 
   assert {
-    condition = length(terraform.plan.resource_changes) == 1
+    condition     = length(terraform.plan.resource_changes) == 1
     error_message = "Valid rule should be included in the plan"
   }
 }
@@ -50,13 +50,13 @@ run "invalid_rule" {
   variables {
     rules = [
       {
-        project                 = "example-project"
-        name                    = "invalid-rule"
-        network                 = "prod"
-        priority                = 1000
-        direction               = "INGRESS"
-        source_ranges           = ["0.0.0.0/0"]
-        allow                   = {
+        project       = "example-project"
+        name          = "invalid-rule"
+        network       = "prod"
+        priority      = 1000
+        direction     = "INGRESS"
+        source_ranges = ["0.0.0.0/0"]
+        allow = {
           protocol = "tcp"
           ports    = ["80", "443"]
         }
@@ -72,7 +72,7 @@ run "invalid_rule" {
   ]
 
   assert {
-    condition = length(terraform.plan.resource_changes) == 0
+    condition     = length(terraform.plan.resource_changes) == 0
     error_message = "Invalid rule should not be included in the plan"
   }
 }
