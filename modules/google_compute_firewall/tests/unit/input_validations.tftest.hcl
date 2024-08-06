@@ -50,9 +50,9 @@ run "invalid_rule" {
   variables {
     rules = [
       {
-        project                 = "example-project"
-        name                    = "invalid-rule"
-        network                 = "prod"
+        project                 = "your-gcp-project-id"
+        name                    = "integration-test-invalid-rule"
+        network                 = "default"
         priority                = 1000
         direction               = "INGRESS"
         source_ranges           = ["0.0.0.0/0"]
@@ -72,7 +72,7 @@ run "invalid_rule" {
   ]
 
   assert {
-    condition = length(var.rules[0].source_ranges) == 0
+    condition = length(terraform.error) > 0
     error_message = "The invalid rule should not be included in the plan"
   }
 }
