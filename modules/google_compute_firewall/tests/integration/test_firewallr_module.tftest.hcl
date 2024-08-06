@@ -42,7 +42,7 @@ run "apply_invalid_rule" {
       {
         project                 = "kerewes-root-613169ca279cb281"
         name                    = "integration-test-invalid-rule"
-        network                 = "default"
+        network                 = "prod"
         priority                = 1000
         direction               = "INGRESS"
         source_ranges           = ["0.0.0.0/0"]
