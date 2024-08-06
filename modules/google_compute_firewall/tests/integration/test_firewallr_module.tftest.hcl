@@ -29,7 +29,7 @@ run "apply_valid_rule" {
   command = apply
 
   assert {
-    condition = length(terraform.apply.resource_changes) == 1
+    condition = length(output.firewall_rules) == 1
     error_message = "The valid rule should be applied successfully"
   }
 }
@@ -62,7 +62,7 @@ run "apply_invalid_rule" {
   ]
 
   assert {
-    condition = length(terraform.apply.resource_changes) == 0
+    condition = length(output.firewall_rules) == 0
     error_message = "The invalid rule should not be applied"
   }
 }
