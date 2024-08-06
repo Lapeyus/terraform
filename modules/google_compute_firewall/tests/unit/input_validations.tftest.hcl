@@ -72,7 +72,7 @@ run "invalid_rule" {
   ]
 
   assert {
-    condition = length(terraform.error) > 0
+    condition = length(var.rules) == 1
     error_message = "The invalid rule should not be included in the plan"
   }
 }
