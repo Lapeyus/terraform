@@ -52,7 +52,7 @@ run "invalid_rule" {
       {
         project                 = "your-gcp-project-id"
         name                    = "integration-test-invalid-rule"
-        network                 = "default"
+        network                 = "prod"
         priority                = 1000
         direction               = "INGRESS"
         source_ranges           = ["0.0.0.0/0"]
