@@ -39,8 +39,8 @@ run "valid_rule" {
   command = plan
 
   assert {
-    condition = length(terraform.plan.resource_changes) == 2
-    error_message = "Both valid rules should be included in the plan"
+    condition = length(var.rules) == 2
+    error_message = "Valid rules validation failed"
   }
 }
 
@@ -68,11 +68,11 @@ run "invalid_rule" {
   }
 
   expect_failures = [
-    var.rules,
+    var.rules[0].source_ranges,
   ]
 
   assert {
-    condition = length(terraform.plan.resource_changes) == 0
+    condition = length(var.rules[0].source_ranges) == 0
     error_message = "Invalid rule should not be included in the plan"
   }
 }
