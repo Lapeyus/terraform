@@ -68,11 +68,11 @@ run "invalid_rule" {
   }
 
   expect_failures = [
-    var.rules[0].source_ranges
+    var.rules[0]
   ]
 
   assert {
-    condition = false
+    condition = length(var.rules[0].source_ranges) == 0
     error_message = "The invalid rule should not be included in the plan"
   }
 }
