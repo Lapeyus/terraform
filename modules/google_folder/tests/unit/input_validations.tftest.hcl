@@ -11,8 +11,8 @@ variables {
       external_parent_id = "organizations/123456789"
     }
     layer2 = {
-      name               = "Layer 2"
-      parent_entry_key   = "layer1"
+      name             = "Layer 2"
+      parent_entry_key = "layer1"
     }
   }
 }

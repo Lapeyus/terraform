@@ -13,40 +13,40 @@ run "create_folders" {
         external_parent_id = "organizations/562898704687"
       }
       "layer2_folder_1" = {
-        name               = "L2-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer1_folder_1"
+        name             = "L2-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer1_folder_1"
       }
       "layer3_folder_1" = {
-        name               = "L3-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer2_folder_1"
+        name             = "L3-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer2_folder_1"
       }
       "layer4_folder_1" = {
-        name               = "L4-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer3_folder_1"
+        name             = "L4-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer3_folder_1"
       }
       "layer5_folder_1" = {
-        name               = "L5-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer4_folder_1"
+        name             = "L5-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer4_folder_1"
       }
       "layer6_folder_1" = {
-        name               = "L6-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer5_folder_1"
+        name             = "L6-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer5_folder_1"
       }
       "layer7_folder_1" = {
-        name               = "L7-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer6_folder_1"
+        name             = "L7-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer6_folder_1"
       }
       "layer8_folder_1" = {
-        name               = "L8-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer7_folder_1"
+        name             = "L8-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer7_folder_1"
       }
       "layer9_folder_1" = {
-        name               = "L9-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer8_folder_1"
+        name             = "L9-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer8_folder_1"
       }
       "layer10_folder_1" = {
-        name               = "L10-${substr(replace(timestamp(), "-", ""), 0, 8)}"
-        parent_entry_key   = "layer9_folder_1"
+        name             = "L10-${substr(replace(timestamp(), "-", ""), 0, 8)}"
+        parent_entry_key = "layer9_folder_1"
       }
     }
   }
