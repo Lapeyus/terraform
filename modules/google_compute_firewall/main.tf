@@ -1,5 +1,5 @@
 resource "google_compute_firewall" "firewall" {
-  for_each                = { for idx, fw in var.firewalls : idx => fw }
+  for_each                = { for idx, fw in var.rules : idx => fw }
   project                 = each.value.project
   name                    = each.value.name
   network                 = each.value.network

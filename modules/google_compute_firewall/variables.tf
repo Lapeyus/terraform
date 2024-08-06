@@ -1,4 +1,4 @@
-variable "firewalls" {
+variable "rules" {
   type = list(object({
     project                 = string
     name                    = string
@@ -23,22 +23,35 @@ variable "firewalls" {
   default = []
 
   validation {
-    condition = alltrue([for fw in var.firewalls : (
+    condition = alltrue([for fw in var.rules : (
       fw.name != null && length(fw.name) >= 1 && length(fw.name) <= 63 &&
       can(
         regex("[a-z]([-a-z0-9]*[a-z0-9])?", fw.name)
       ) &&
-      (fw.direction == "INGRESS" || fw.direction == "EGRESS") &&
-      (fw.disabled == true || fw.disabled == false || fw.disabled == null) &&
+      (
+        fw.direction == "INGRESS" ||
+        fw.direction == "EGRESS"
+      ) &&
+      (
+        fw.disabled == true ||
+        fw.disabled == false ||
+        fw.disabled == null
+      ) &&
       fw.priority >= 0 && fw.priority <= 65535 &&
-      (fw.log_config == null || fw.log_config.metadata == "EXCLUDE_ALL_METADATA" || fw.log_config.metadata == "INCLUDE_ALL_METADATA") &&
-      (fw.network != "prod" || alltrue(
-        [for sr in fw.source_ranges : sr != "0.0.0.0/0"]
+      (
+        fw.log_config == null ||
+        fw.log_config.metadata == "EXCLUDE_ALL_METADATA" ||
+        fw.log_config.metadata == "INCLUDE_ALL_METADATA"
+      ) &&
+      (
+        fw.network != "prod" || alltrue(
+          [for sr in fw.source_ranges : sr != "0.0.0.0/0"]
         )
       ) &&
-      (fw.network != "dev" || alltrue(
-        [for sr in fw.source_ranges : sr != "10.0.0.0/0"],
-        [for sr in fw.source_ranges : sr != "10.10.0.0/0"]
+      (
+        fw.network != "dev" || alltrue(
+          [for sr in fw.source_ranges : sr != "10.0.0.0/0"],
+          [for sr in fw.source_ranges : sr != "10.10.0.0/0"]
         )
       )
     )])
