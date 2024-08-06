@@ -1,4 +1,4 @@
-# tests/integration/test_firewallr_module.tftest.hcl
+# tests/integration/test_firewall_module.tftest.hcl
 
 provider "google" {
   project = "kerewes-root-613169ca279cb281"
@@ -29,7 +29,7 @@ run "apply_valid_rule" {
   command = apply
 
   assert {
-    condition = length(google_compute_firewall.firewall_rules) == 1
+    condition = length(terraform.apply.resource_changes) == 1
     error_message = "The valid rule should be applied successfully"
   }
 }
@@ -62,7 +62,7 @@ run "apply_invalid_rule" {
   ]
 
   assert {
-    condition = length(google_compute_firewall.firewall_rules) == 0
+    condition = length(terraform.apply.resource_changes) == 0
     error_message = "The invalid rule should not be applied"
   }
 }
