@@ -24,10 +24,10 @@ variable "firewalls" {
 
   validation {
     condition = alltrue([for fw in var.firewalls : (
-      fw.name != null &&
-      length(fw.name) >= 1 &&
-      length(fw.name) <= 63 &&
-      can(regex("[a-z]([-a-z0-9]*[a-z0-9])?", fw.name)) &&
+      fw.name != null && length(fw.name) >= 1 && length(fw.name) <= 63 &&
+      can(
+        regex("[a-z]([-a-z0-9]*[a-z0-9])?", fw.name)
+      ) &&
       (fw.direction == "INGRESS" || fw.direction == "EGRESS") &&
       (fw.disabled == true || fw.disabled == false || fw.disabled == null) &&
       fw.priority >= 0 && fw.priority <= 65535 &&
@@ -37,7 +37,8 @@ variable "firewalls" {
         )
       ) &&
       (fw.network != "dev" || alltrue(
-        [for sr in fw.source_ranges : sr != "10.0.0.0/0"]
+        [for sr in fw.source_ranges : sr != "10.0.0.0/0"],
+        [for sr in fw.source_ranges : sr != "10.10.0.0/0"]
         )
       )
     )])
