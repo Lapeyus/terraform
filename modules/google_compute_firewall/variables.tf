@@ -49,10 +49,11 @@ variable "rules" {
         )
       ) &&
       (
-        fw.network != "dev" || alltrue(
-          [for sr in fw.source_ranges : sr != "10.0.0.0/0"] &&
-          [for sr in fw.source_ranges : sr != "10.10.0.0/0"]
-        )
+        fw.network != "dev" || alltrue([
+          for sr in fw.source_ranges : sr != "10.0.0.0/0"
+          ]) && alltrue([
+          for sr in fw.source_ranges : sr != "10.10.0.0/0"
+        ])
       )
     )])
     error_message = "Validation error: Ensure 'name' is specified, 1-63 characters long, matches the pattern '[a-z]([-a-z0-9]*[a-z0-9])?', 'direction' is either 'INGRESS' or 'EGRESS', 'disabled' is either true or false, 'priority' is an integer between 0 and 65535, 'log_config.metadata' is either 'EXCLUDE_ALL_METADATA' or 'INCLUDE_ALL_METADATA' if provided, and 'source_ranges' does not include '0.0.0.0/0' if 'network' is 'prod'."
