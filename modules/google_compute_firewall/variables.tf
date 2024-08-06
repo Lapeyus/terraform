@@ -50,7 +50,8 @@ variable "rules" {
       ) &&
       (
         fw.network != "dev" || alltrue(
-          [for sr in fw.source_ranges : sr != "10.0.0.0/0" && sr != "10.10.0.0/0"]
+          [for sr in fw.source_ranges : sr != "10.0.0.0/0"] &&
+          [for sr in fw.source_ranges : sr != "10.10.0.0/0"]
         )
       )
     )])
