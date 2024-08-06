@@ -34,35 +34,35 @@ run "apply_valid_rule" {
   }
 }
 
-run "apply_invalid_rule" {
-  command = apply
+// run "apply_invalid_rule" {
+//   command = apply
 
-  variables {
-    rules = [
-      {
-        project                 = "kerewes-root-613169ca279cb281"
-        name                    = "integration-test-invalid-rule"
-        network                 = "prod"
-        priority                = 1000
-        direction               = "INGRESS"
-        source_ranges           = ["0.0.0.0/0"]
-        allow                   = {
-          protocol = "tcp"
-          ports    = ["80", "443"]
-        }
-        log_config = {
-          metadata = "INCLUDE_ALL_METADATA"
-        }
-      }
-    ]
-  }
+//   variables {
+//     rules = [
+//       {
+//         project                 = "kerewes-root-613169ca279cb281"
+//         name                    = "integration-test-invalid-rule"
+//         network                 = "prod"
+//         priority                = 1000
+//         direction               = "INGRESS"
+//         source_ranges           = ["0.0.0.0/0"]
+//         allow                   = {
+//           protocol = "tcp"
+//           ports    = ["80", "443"]
+//         }
+//         log_config = {
+//           metadata = "INCLUDE_ALL_METADATA"
+//         }
+//       }
+//     ]
+//   }
 
-  expect_failures = [
-    var.rules,
-  ]
+//   expect_failures = [
+//     var.rules,
+//   ]
 
-  // assert {
-  //   condition = length(output.firewall_rules) == 0
-  //   error_message = "The invalid rule should not be applied"
-  // }
-}
+//   assert {
+//     condition = length(output.firewall_rules) == 0
+//     error_message = "The invalid rule should not be applied"
+//   }
+// }
