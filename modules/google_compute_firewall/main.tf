@@ -33,7 +33,7 @@ resource "google_compute_firewall" "firewall" {
   dynamic "log_config" {
     for_each = try(each.value.metadata != null ? [1] : [], [])
     content {
-      metadata = each.value.metadata
+      metadata = each.value.log_config.metadata
     }
   }
 }
