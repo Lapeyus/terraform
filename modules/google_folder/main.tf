@@ -10,7 +10,7 @@ locals {
 }
 
 resource "google_folder" "layer2_folders" {
-  for_each     = { for key, folder in var.folders : key => folder if try(contains(local.layer1_keys, folder.parent_entry_key), false) }
+  for_each      = { for key, folder in var.folders : key => folder if try(contains(local.layer1_keys, folder.parent_entry_key), false) }
   display_name = each.value.name != null ? each.value.name : each.key
   parent       = google_folder.layer1_folders[each.value.parent_entry_key].name
   depends_on   = [google_folder.layer1_folders]
