@@ -1,78 +1,132 @@
-# tests/unit/input_validations.tftest.hcl
+# tests/apply_test.tftest.hcl
+
+provider "google" {
+  project = "my-gcp-project"
+  region  = "us-central1"
+}
 
 variables {
-  rules = [
-    {
-      project                 = "example-project"
-      name                    = "valid-rule"
-      network                 = "dev"
-      priority                = 1000
-      direction               = "INGRESS"
-      source_ranges           = ["10.0.0.0/8"]
-      allow                   = {
-        protocol = "tcp"
-        ports    = ["80", "443"]
-      }
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    },
-    {
-      project                 = "example-project"
-      name                    = "valid-rule-2"
-      network                 = "prod"
-      priority                = 1000
-      direction               = "INGRESS"
-      source_ranges           = ["192.168.1.0/24"]
-      allow                   = {
-        protocol = "tcp"
-        ports    = ["80", "443"]
-      }
-      log_config = {
-        metadata = "INCLUDE_ALL_METADATA"
-      }
-    }
-  ]
-}
-
-run "valid_rule" {
-  command = plan
-
-  assert {
-    condition = length(var.rules) == 2
-    error_message = "Valid rules validation failed"
-  }
-}
-
-run "invalid_rule" {
-  command = plan
-
-  variables {
+  rules = {
+    parent     = "organizations/1234567890"
+    short_name = "apply-firewall"
+    description = "Test firewall policy"
     rules = [
       {
-        project                 = "your-gcp-project-id"
-        name                    = "integration-test-invalid-rule"
-        network                 = "prod"
-        priority                = 1000
-        direction               = "INGRESS"
-        source_ranges           = ["0.0.0.0/0"]
-        allow                   = {
-          protocol = "tcp"
-          ports    = ["80", "443"]
-        }
-        log_config = {
-          metadata = "INCLUDE_ALL_METADATA"
+        action          = "allow"
+        direction       = "INGRESS"
+        firewall_policy = "apply-policy"
+        priority        = 1000
+        match = {
+          layer4_configs = [
+            {
+              ip_protocol = "tcp"
+              ports       = ["80"]
+            }
+          ]
         }
       }
     ]
   }
+}
 
-  expect_failures = [
-    var.rules[0]
-  ]
+run "apply_firewall_policy" {
+  command = plan
 
   assert {
-    condition = length(var.rules) == 1
-    error_message = "The invalid rule should not be included in the plan"
+    condition     = google_compute_firewall_policy.default.short_name == "apply-firewall"
+    error_message = "Firewall policy short_name did not match expected"
+  }
+
+  assert {
+    condition     = length(google_compute_firewall_policy_rule.rules) == 1
+    error_message = "Number of firewall rules did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].action == "allow"
+    error_message = "Firewall rule action did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].direction == "INGRESS"
+    error_message = "Firewall rule direction did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].priority == 1000
+    error_message = "Firewall rule priority did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ip_protocol == "tcp"
+    error_message = "Firewall rule IP protocol did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ports[0] == "80"
+    error_message = "Firewall rule ports did not match expected"
+  }
+}
+
+run "override_apply_variable_value" {
+  command = plan
+
+  variables {
+    rules = {
+      parent     = "organizations/1234567890"
+      short_name = "override-apply-firewall"
+      description = "Override test firewall policy"
+      rules = [
+        {
+          action          = "deny"
+          direction       = "EGRESS"
+          firewall_policy = "override-apply-policy"
+          priority        = 2000
+          match = {
+            layer4_configs = [
+              {
+                ip_protocol = "udp"
+                ports       = ["53"]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy.default.short_name == "override-apply-firewall"
+    error_message = "Overridden firewall policy short_name did not match expected"
+  }
+
+  assert {
+    condition     = length(google_compute_firewall_policy_rule.rules) == 1
+    error_message = "Number of firewall rules did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].action == "deny"
+    error_message = "Firewall rule action did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].direction == "EGRESS"
+    error_message = "Firewall rule direction did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].priority == 2000
+    error_message = "Firewall rule priority did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ip_protocol == "udp"
+    error_message = "Firewall rule IP protocol did not match expected"
+  }
+
+  assert {
+    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ports[0] == "53"
+    error_message = "Firewall rule ports did not match expected"
   }
 }

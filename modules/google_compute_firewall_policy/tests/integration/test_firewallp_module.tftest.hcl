@@ -1,13 +1,13 @@
 # tests/apply_test.tftest.hcl
 
 provider "google" {
-  project = "my-gcp-project"
+  project = "kerewes-root-613169ca279cb281"
   region  = "us-central1"
 }
 
 variables {
   rules = {
-    parent     = "organizations/1234567890"
+    parent     = "organizations/562898704687"
     short_name = "apply-firewall"
     description = "Test firewall policy"
     rules = [
@@ -73,7 +73,7 @@ run "override_apply_variable_value" {
 
   variables {
     rules = {
-      parent     = "organizations/1234567890"
+      parent     = "organizations/562898704687"
       short_name = "override-apply-firewall"
       description = "Override test firewall policy"
       rules = [
