@@ -9,6 +9,7 @@ variables {
   rules = {
     parent     = "organizations/1234567890"
     short_name = "apply-firewall"
+    description = "Test firewall policy"
     rules = [
       {
         action          = "allow"
@@ -74,6 +75,7 @@ run "override_apply_variable_value" {
     rules = {
       parent     = "organizations/1234567890"
       short_name = "override-apply-firewall"
+      description = "Override test firewall policy"
       rules = [
         {
           action          = "deny"
