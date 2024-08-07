@@ -43,27 +43,27 @@ run "apply_firewall_policy" {
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].action == "allow"
+    condition     = google_compute_firewall_policy_rule.rules[0].action == "allow"
     error_message = "Firewall rule action did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].direction == "INGRESS"
+    condition     = google_compute_firewall_policy_rule.rules[0].direction == "INGRESS"
     error_message = "Firewall rule direction did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].priority == 1000
+    condition     = google_compute_firewall_policy_rule.rules[0].priority == 1000
     error_message = "Firewall rule priority did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ip_protocol == "tcp"
+    condition     = google_compute_firewall_policy_rule.rules[0].match.layer4_configs[0].ip_protocol == "tcp"
     error_message = "Firewall rule IP protocol did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ports[0] == "80"
+    condition     = google_compute_firewall_policy_rule.rules[0].match.layer4_configs[0].ports[0] == "80"
     error_message = "Firewall rule ports did not match expected"
   }
 }
@@ -106,27 +106,27 @@ run "override_apply_variable_value" {
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].action == "deny"
+    condition     = google_compute_firewall_policy_rule.rules[0].action == "deny"
     error_message = "Firewall rule action did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].direction == "EGRESS"
+    condition     = google_compute_firewall_policy_rule.rules[0].direction == "EGRESS"
     error_message = "Firewall rule direction did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].priority == 2000
+    condition     = google_compute_firewall_policy_rule.rules[0].priority == 2000
     error_message = "Firewall rule priority did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ip_protocol == "udp"
+    condition     = google_compute_firewall_policy_rule.rules[0].match.layer4_configs[0].ip_protocol == "udp"
     error_message = "Firewall rule IP protocol did not match expected"
   }
 
   assert {
-    condition     = google_compute_firewall_policy_rule.rules["0"].match.layer4_configs["0"].ports[0] == "53"
+    condition     = google_compute_firewall_policy_rule.rules[0].match.layer4_configs[0].ports[0] == "53"
     error_message = "Firewall rule ports did not match expected"
   }
 }
