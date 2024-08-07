@@ -84,7 +84,8 @@ run "override_apply_variable_value" {
           firewall_policy = "override-apply-policy"
           priority        = 2000
           match = {
-            src_ip_ranges = ["0.0.0.0/0"]
+            src_ip_ranges = ["10.128.0.0/20"]
+            dest_ip_ranges = ["0.0.0.0/0"]
             layer4_configs = [
               {
                 ip_protocol = "udp"
