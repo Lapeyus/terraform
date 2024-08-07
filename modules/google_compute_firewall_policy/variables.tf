@@ -1,8 +1,9 @@
-variable "rules" {
+variable "policies" {
   type = object({
-    parent      = string
-    short_name  = string
-    description = optional(string)
+    parent            = string
+    short_name        = string
+    description       = optional(string)
+    attachment_target = optional(string)
     rules = list(
       object({
         action                  = string

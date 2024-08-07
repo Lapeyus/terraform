@@ -1,10 +1,18 @@
 resource "google_compute_firewall_policy" "default" {
-  parent      = var.rules.parent
-  short_name  = var.rules.short_name
-  description = var.rules.description
+  parent      = var.policies.parent
+  short_name  = var.policies.short_name
+  description = var.policies.description
 }
+
+resource "google_compute_firewall_policy_association" "default" {
+  count             = var.policies.attachment_target != null ? 1 : 0
+  firewall_policy   = google_compute_firewall_policy.default.id
+  attachment_target = var.policies.attachment_target
+  name              = "${var.policies.short_name}-association"
+}
+
 resource "google_compute_firewall_policy_rule" "rules" {
-  for_each = { for idx, rule in var.rules.rules : idx => rule }
+  for_each = { for idx, rule in var.policies.rules : idx => rule }
 
   action                  = each.value.action
   direction               = each.value.direction
