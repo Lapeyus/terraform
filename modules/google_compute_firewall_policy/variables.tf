@@ -1,4 +1,4 @@
-variable "policies" {
+variable "policy" {
   type = object({
     parent            = string
     short_name        = string

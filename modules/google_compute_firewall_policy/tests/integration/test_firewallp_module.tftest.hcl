@@ -6,7 +6,7 @@ provider "google" {
 }
 
 variables {
-  rules = {
+  policy = {
     parent     = "organizations/562898704687"
     short_name = "apply-firewall"
     description = "Test firewall policy"
@@ -73,10 +73,11 @@ run "override_apply_variable_value" {
   command = apply
 
   variables {
-    rules = {
+    policy = {
       parent      = "organizations/562898704687"
       short_name  = "override-apply-firewall"
       description = "Override test firewall policy"
+      attachment_target = "organizations/562898704687"
       rules = [
         {
           action          = "deny"

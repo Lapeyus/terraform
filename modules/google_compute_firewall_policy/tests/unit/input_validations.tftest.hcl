@@ -6,7 +6,7 @@ provider "google" {
 }
 
 variables {
-  rules = {
+  policy = {
     parent     = "organizations/1234567890"
     short_name = "apply-firewall"
     description = "Test firewall policy"
@@ -72,7 +72,7 @@ run "override_apply_variable_value" {
   command = plan
 
   variables {
-    rules = {
+    policy = {
       parent     = "organizations/1234567890"
       short_name = "override-apply-firewall"
       description = "Override test firewall policy"
