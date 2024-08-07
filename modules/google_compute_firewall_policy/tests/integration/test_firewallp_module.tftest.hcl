@@ -15,7 +15,6 @@ variables {
         direction       = "INGRESS"
         firewall_policy = "apply-policy"
         priority        = 1000
-        description     = "Allow ingress traffic"
         match = {
           layer4_configs = [
             {
@@ -33,8 +32,8 @@ run "apply_firewall_policy" {
   command = apply
 
   assert {
-    condition     = google_compute_firewall_policy.default.name == "apply-firewall"
-    error_message = "Firewall policy name did not match expected"
+    condition     = google_compute_firewall_policy.default.short_name == "apply-firewall"
+    error_message = "Firewall policy short_name did not match expected"
   }
 
   assert {
@@ -81,7 +80,6 @@ run "override_apply_variable_value" {
           direction       = "EGRESS"
           firewall_policy = "override-apply-policy"
           priority        = 2000
-          description     = "Deny egress traffic"
           match = {
             layer4_configs = [
               {
@@ -96,8 +94,8 @@ run "override_apply_variable_value" {
   }
 
   assert {
-    condition     = google_compute_firewall_policy.default.name == "override-apply-firewall"
-    error_message = "Overridden firewall policy name did not match expected"
+    condition     = google_compute_firewall_policy.default.short_name == "override-apply-firewall"
+    error_message = "Overridden firewall policy short_name did not match expected"
   }
 
   assert {

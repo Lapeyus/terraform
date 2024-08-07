@@ -5,33 +5,18 @@ variable "rules" {
     description = optional(string)
     rules = list(
       object({
-        project                 = string
-        name                    = string
-        network                 = string
+        action                  = string
+        direction               = string
+        firewall_policy         = string
         priority                = number
         description             = optional(string)
-        destination_ranges      = optional(list(string))
-        direction               = string
         disabled                = optional(bool)
-        source_ranges           = optional(list(string))
-        source_service_accounts = optional(list(string))
-        source_tags             = optional(list(string))
+        enable_logging          = optional(bool)
+        security_profile_group  = optional(string)
+        target_resources        = optional(list(string))
         target_service_accounts = optional(list(string))
-        target_tags             = optional(list(string))
-        allow = optional(list(object({
-          protocol = string
-          ports    = optional(list(string))
-        })))
-        deny = optional(list(object({
-          protocol = string
-          ports    = optional(list(string))
-        })))
-        metadata = optional(string)
-        log_config = optional(object({
-          metadata = string
-        }))
-        action          = string
-        firewall_policy = string
+        tls_inspect             = optional(bool)
+
         match = object({
           dest_address_groups       = optional(list(string))
           dest_fqdns                = optional(list(string))
@@ -48,17 +33,7 @@ variable "rules" {
           src_region_codes         = optional(list(string))
           src_threat_intelligences = optional(list(string))
         })
-        enable_logging         = optional(bool)
-        security_profile_group = optional(string)
-        target_resources       = optional(list(string))
-        tls_inspect            = optional(bool)
       })
     )
   })
-  default = {
-    parent      = ""
-    short_name  = ""
-    description = null
-    rules       = []
-  }
 }
